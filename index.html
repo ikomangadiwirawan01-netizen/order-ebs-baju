@@ -275,8 +275,11 @@ alert("Terkirim ke Google Sheet");
 render();
 
 // REGISTER SW
-if('serviceWorker'in navigator){
-navigator.serviceWorker.register('service-worker.js');
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+    .then(reg => {
+      reg.update();
+    });
 }
 </script>
 
