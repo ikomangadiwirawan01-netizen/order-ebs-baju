@@ -11,39 +11,139 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-body { font-family: Arial; background:#f4f4f4; padding:20px; }
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 10px;
+    background: #f4f4f4;
+}
+
+/* CONTAINER */
 .container {
-    width:100%;
-    max-width:900px;
-    margin:20px auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
-    body {
-    margin:0;
-    padding:10px;
+    width: 100%;
+    max-width: 700px;
+    margin: auto;
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
+/* TITLE */
 h2 {
-    text-align:center;
+    text-align: center;
+    margin-bottom: 15px;
 }
 
-input { width:100%; padding:8px; margin:5px 0; }
-button { padding:8px; margin:3px; border:none; cursor:pointer; }
+/* INPUT */
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
 
-.btn { background:#2196F3; color:white; }
-.delete-btn { background:red; color:white; }
+/* LABEL */
+label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+}
 
-table { width:100%; margin-top:20px; border-collapse:collapse; }
-table, th, td { border:1px solid #ddd; }
-th, td { padding:10px; text-align:center; }
-
+/* RADIO GROUP */
 .radio-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
+    margin: 5px 0 10px 0;
+}
+
+/* RADIO ITEM */
+.radio-group label,
+.radio-group input {
+    cursor: pointer;
+}
+
+/* BUTTON */
+button {
+    padding: 10px;
+    margin: 5px 3px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn {
+    background: #2196F3;
+    color: white;
+}
+
+.delete-btn {
+    background: red;
+    color: white;
+}
+
+/* BUTTON WRAP (biar rapi di HP) */
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    margin-top: 15px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+th, td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+/* RESPONSIVE TABLE (HP) */
+@media (max-width: 600px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    tr {
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 8px;
+        background: #fafafa;
+    }
+
+    td {
+        text-align: left;
+        border: none;
+        padding: 5px 0;
+    }
+
+    td::before {
+        font-weight: bold;
+        display: block;
+    }
+
+    td:nth-child(1)::before { content: "Nama"; }
+    td:nth-child(2)::before { content: "Size"; }
+    td:nth-child(3)::before { content: "Lengan"; }
+    td:nth-child(4)::before { content: "Umur"; }
+    td:nth-child(5)::before { content: "Gender"; }
+    td:nth-child(6)::before { content: "No HP"; }
+    td:nth-child(7)::before { content: "Waktu"; }
 }
 </style>
 </head>
