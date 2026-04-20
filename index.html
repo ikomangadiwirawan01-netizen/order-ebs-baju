@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pemesanan Baju</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2196F3">
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+body { font-family: Arial; background:#f4f4f4; padding:20px; }
+.container { max-width:800px; margin:auto; background:white; padding:20px; border-radius:10px; }
+
+input { width:100%; padding:8px; margin:5px 0; }
+button { padding:8px; margin:3px; border:none; cursor:pointer; }
+
+.btn { background:#2196F3; color:white; }
+.delete-btn { background:red; color:white; }
+
+table { width:100%; margin-top:20px; border-collapse:collapse; }
+table, th, td { border:1px solid #ddd; }
+th, td { padding:10px; text-align:center; }
+
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>PEMESANAN BAJU</h2>
+
+<input type="text" id="nama" placeholder="Nama">
+
+<label>Size:</label>
+<div class="radio-group">
+<input type="radio" name="size" value="XS" checked> XS
+<input type="radio" name="size" value="S"> S
+<input type="radio" name="size" value="M"> M
+<input type="radio" name="size" value="L"> L
+<input type="radio" name="size" value="XL"> XL
+<input type="radio" name="size" value="XXL"> XXL
+<input type="radio" name="size" value="XXXL"> XXXL
+<input type="radio" name="size" value="Lainnya" onclick="toggleSize()"> Lainnya
+</div>
+
+<input type="text" id="sizeLainnya" placeholder="Isi size lainnya..." style="display:none;">
+
+<label>Lengan:</label>
+<div class="radio-group">
+<input type="radio" name="lengan" value="Pendek" checked> Pendek
+<input type="radio" name="lengan" value="Panjang"> Panjang
+</div>
+
+<label>Kategori Umur:</label>
+<div class="radio-group">
+<input type="radio" name="umur" value="Dewasa" checked> Dewasa
+<input type="radio" name="umur" value="Anak-Anak"> Anak-Anak
+</div>
+
+<label>Gender:</label>
+<div class="radio-group">
+<input type="radio" name="gender" value="Cowok" checked> Cowok
+<input type="radio" name="gender" value="Cewek"> Cewek
+</div>
+
+<input type="text" id="hp" placeholder="No HP (boleh kosong)">
+
+<button class="btn" onclick="simpan()">Simpan</button>
+<button class="btn" onclick="exportExcel()">Export Excel</button>
+<button class="btn" onclick="kirimKeSheet()">Kirim ke Google Sheet</button>
+
+<table>
+<thead>
+<tr>
+<th>Nama</th><th>Size</th><th>Lengan</th><th>Umur</th><th>Gender</th><th>No HP</th><th>Waktu</th><th>Aksi</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("orders")) || [];
+
+function toggleSize(){
+document.getElementById("sizeLainnya").style.display="block";
+}
+
+function simpan(){
+let nama = document.getElementById("nama").value.trim();
+let size = document.querySelector('input[name="size"]:checked').value;
+let hp = document.getElementById("hp").value.trim();
+let lengan = document.querySelector('input[name="lengan"]:checked').value;
+let umur = document.querySelector('input[name="umur"]:checked').value;
+let gender = document.querySelector('input[name="gender"]:checked').value;
+
+if(size==="Lainnya"){
+size=document.getElementById("sizeLainnya").value.trim();
+}
+
+if(!nama||!size||!lengan||!umur||!gender){
+alert("Semua wajib kecuali HP");
+return;
+}
+
+let waktu = new Date().toLocaleString();
+data.push({nama,size,lengan,umur,gender,hp,waktu});
+localStorage.setItem("orders",JSON.stringify(data));
+render();
+}
+
+function render(){
+let tbody=document.getElementById("tbody");
+tbody.innerHTML="";
+data.forEach((d,i)=>{
+tbody.innerHTML+=`<tr>
+<td>${d.nama}</td><td>${d.size}</td><td>${d.lengan}</td>
+<td>${d.umur}</td><td>${d.gender}</td><td>${d.hp}</td>
+<td>${d.waktu}</td>
+<td><button onclick="hapus(${i})">Hapus</button></td>
+</tr>`;
+});
+}
+
+function hapus(i){data.splice(i,1);render();}
+
+function exportExcel(){
+let ws=XLSX.utils.json_to_sheet(data);
+let wb=XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb,ws,"Data");
+XLSX.writeFile(wb,"data.xlsx");
+}
+
+function kirimKeSheet(){
+const url="https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQwt4xlfb_P8vYAYg0DWZajQ/formResponse";
+data.forEach(d=>{
+let f=new FormData();
+f.append("entry.602917443",d.nama);
+f.append("entry.1125006949",d.size);
+f.append("entry.851126045",d.lengan);
+f.append("entry.472633795",d.umur);
+f.append("entry.172735209",d.gender);
+f.append("entry.1294797526",d.hp);
+f.append("entry.804883247",d.waktu);
+fetch(url,{method:"POST",mode:"no-cors",body:f});
+});
+alert("Terkirim ke Google Sheet");
+}
+
+render();
+
+// REGISTER SW
+if('serviceWorker'in navigator){
+navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+
+</body>
+</html>
