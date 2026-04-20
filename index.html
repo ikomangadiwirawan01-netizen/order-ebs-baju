@@ -11,10 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-* {
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
+* { box-sizing: border-box; font-family: Arial, sans-serif; }
 
 body {
     margin: 0;
@@ -22,9 +19,7 @@ body {
     background: #f4f4f4;
 }
 
-/* CONTAINER */
 .container {
-    width: 100%;
     max-width: 700px;
     margin: auto;
     background: #fff;
@@ -33,13 +28,8 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* TITLE */
-h2 {
-    text-align: center;
-    margin-bottom: 15px;
-}
+h2 { text-align: center; }
 
-/* INPUT */
 input[type="text"] {
     width: 100%;
     padding: 10px;
@@ -48,57 +38,25 @@ input[type="text"] {
     border: 1px solid #ccc;
 }
 
-/* LABEL */
-label {
-    font-weight: bold;
-    display: block;
-    margin-top: 10px;
-}
+label { font-weight: bold; display: block; margin-top: 10px; }
 
-/* RADIO GROUP */
 .radio-group {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin: 5px 0 10px 0;
 }
 
-/* RADIO ITEM */
-.radio-group label,
-.radio-group input {
-    cursor: pointer;
-}
-
-/* BUTTON */
 button {
     padding: 10px;
     margin: 5px 3px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
 }
 
-.btn {
-    background: #2196F3;
-    color: white;
-}
+.btn { background: #2196F3; color: white; }
+.delete-btn { background: red; color: white; }
 
-.delete-btn {
-    background: red;
-    color: white;
-}
-
-/* BUTTON WRAP (biar rapi di HP) */
-.button-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-/* TABLE */
 table {
     width: 100%;
     margin-top: 15px;
@@ -112,38 +70,9 @@ th, td {
     text-align: center;
 }
 
-/* RESPONSIVE TABLE (HP) */
-@media (max-width: 600px) {
-    table, thead, tbody, th, td, tr {
-        display: block;
-    }
-
-    tr {
-        margin-bottom: 10px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 8px;
-        background: #fafafa;
-    }
-
-    td {
-        text-align: left;
-        border: none;
-        padding: 5px 0;
-    }
-
-    td::before {
-        font-weight: bold;
-        display: block;
-    }
-
-    td:nth-child(1)::before { content: "Nama"; }
-    td:nth-child(2)::before { content: "Size"; }
-    td:nth-child(3)::before { content: "Lengan"; }
-    td:nth-child(4)::before { content: "Umur"; }
-    td:nth-child(5)::before { content: "Gender"; }
-    td:nth-child(6)::before { content: "No HP"; }
-    td:nth-child(7)::before { content: "Waktu"; }
+/* Status */
+.sent {
+    background: #c8f7c5;
 }
 </style>
 </head>
@@ -152,6 +81,12 @@ th, td {
 
 <div class="container">
 <h2>PEMESANAN BAJU</h2>
+
+<div style="background:#fff3cd; padding:10px; border-radius:8px; border:1px solid #ffeeba; margin-bottom:15px;">
+<b style="color:#856404;">
+BILA MEMASUKAN LEBIH DARI 1 ORDERAN BAJU HARAP KLIK SIMPAN DAHULU DAN JIKA SUDAH SEMUANYA BENAR KLIK KIRIM KE GOOGLE SHEET
+</b>
+</div>
 
 <input type="text" id="nama" placeholder="Nama">
 
@@ -196,7 +131,7 @@ th, td {
 <table>
 <thead>
 <tr>
-<th>Nama</th><th>Size</th><th>Lengan</th><th>Umur</th><th>Gender</th><th>No HP</th><th>Waktu</th><th>Aksi</th>
+<th>Nama</th><th>Size</th><th>Lengan</th><th>Umur</th><th>Gender</th><th>No HP</th><th>Waktu</th><th>Status</th><th>Aksi</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -211,7 +146,19 @@ function toggleSize(){
 document.getElementById("sizeLainnya").style.display="block";
 }
 
-function simpan(){
+// CEK DUPLIKAT
+function isDuplicate(newData){
+return data.some(d =>
+d.nama===newData.nama &&
+d.size===newData.size &&
+d.lengan===newData.lengan &&
+d.umur===newData.umur &&
+d.gender===newData.gender &&
+d.hp===newData.hp
+);
+}
+
+function ambilForm(){
 let nama = document.getElementById("nama").value.trim();
 let size = document.querySelector('input[name="size"]:checked').value;
 let hp = document.getElementById("hp").value.trim();
@@ -225,11 +172,22 @@ size=document.getElementById("sizeLainnya").value.trim();
 
 if(!nama||!size||!lengan||!umur||!gender){
 alert("Semua wajib kecuali HP");
+return null;
+}
+
+return {nama,size,lengan,umur,gender,hp,waktu:new Date().toLocaleString(),status:"Belum"};
+}
+
+function simpan(){
+let form = ambilForm();
+if(!form) return;
+
+if(isDuplicate(form)){
+alert("❌ Data sudah ada!");
 return;
 }
 
-let waktu = new Date().toLocaleString();
-data.push({nama,size,lengan,umur,gender,hp,waktu});
+data.push(form);
 localStorage.setItem("orders",JSON.stringify(data));
 render();
 }
@@ -238,16 +196,25 @@ function render(){
 let tbody=document.getElementById("tbody");
 tbody.innerHTML="";
 data.forEach((d,i)=>{
-tbody.innerHTML+=`<tr>
-<td>${d.nama}</td><td>${d.size}</td><td>${d.lengan}</td>
-<td>${d.umur}</td><td>${d.gender}</td><td>${d.hp}</td>
+tbody.innerHTML+=`<tr class="${d.status==='Terkirim'?'sent':''}">
+<td>${d.nama}</td>
+<td>${d.size}</td>
+<td>${d.lengan}</td>
+<td>${d.umur}</td>
+<td>${d.gender}</td>
+<td>${d.hp}</td>
 <td>${d.waktu}</td>
+<td>${d.status}</td>
 <td><button onclick="hapus(${i})">Hapus</button></td>
 </tr>`;
 });
 }
 
-function hapus(i){data.splice(i,1);render();}
+function hapus(i){
+data.splice(i,1);
+localStorage.setItem("orders",JSON.stringify(data));
+render();
+}
 
 function exportExcel(){
 let ws=XLSX.utils.json_to_sheet(data);
@@ -256,9 +223,44 @@ XLSX.utils.book_append_sheet(wb,ws,"Data");
 XLSX.writeFile(wb,"data.xlsx");
 }
 
+// 🔥 KIRIM
 function kirimKeSheet(){
 const url="https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQwt4xlfb_P8vYAYg0DWZajQ/formResponse";
+
+// ambil input langsung
+let form = ambilForm();
+
+// jika tidak ada data di tabel → kirim langsung
+if(data.length===0 && form){
+if(isDuplicate(form)){
+alert("❌ Data sudah pernah dikirim!");
+return;
+}
+kirim(form);
+alert("✅ Langsung terkirim!");
+return;
+}
+
+// kirim semua data tabel
 data.forEach(d=>{
+if(d.status==="Terkirim") return;
+kirim(d);
+d.status="Terkirim";
+});
+
+// simpan & refresh
+localStorage.setItem("orders",JSON.stringify(data));
+render();
+
+// hapus setelah kirim
+data=[];
+localStorage.removeItem("orders");
+render();
+
+alert("✅ Semua data terkirim & tabel dikosongkan");
+}
+
+function kirim(d){
 let f=new FormData();
 f.append("entry.602917443",d.nama);
 f.append("entry.1125006949",d.size);
@@ -267,19 +269,17 @@ f.append("entry.472633795",d.umur);
 f.append("entry.172735209",d.gender);
 f.append("entry.1294797526",d.hp);
 f.append("entry.804883247",d.waktu);
-fetch(url,{method:"POST",mode:"no-cors",body:f});
-});
-alert("Terkirim ke Google Sheet");
+
+fetch("https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQwt4xlfb_P8vYAYg0DWZajQ/formResponse",
+{method:"POST",mode:"no-cors",body:f});
 }
 
 render();
 
-// REGISTER SW
+// SERVICE WORKER UPDATE
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js')
-    .then(reg => {
-      reg.update();
-    });
+navigator.serviceWorker.register('service-worker.js')
+.then(reg=>reg.update());
 }
 </script>
 
