@@ -70,7 +70,6 @@ th, td {
     text-align: center;
 }
 
-/* Status */
 .sent {
     background: #c8f7c5;
 }
@@ -91,7 +90,7 @@ BILA MEMASUKAN LEBIH DARI 1 ORDERAN BAJU HARAP KLIK SIMPAN DAHULU DAN JIKA SUDAH
 <input type="text" id="nama" placeholder="Nama">
 
 <label>Size:</label>
-<div class="radio-group">
+<div class="radio-group" onchange="toggleSize()">
 <input type="radio" name="size" value="XS" checked> XS
 <input type="radio" name="size" value="S"> S
 <input type="radio" name="size" value="M"> M
@@ -99,7 +98,7 @@ BILA MEMASUKAN LEBIH DARI 1 ORDERAN BAJU HARAP KLIK SIMPAN DAHULU DAN JIKA SUDAH
 <input type="radio" name="size" value="XL"> XL
 <input type="radio" name="size" value="XXL"> XXL
 <input type="radio" name="size" value="XXXL"> XXXL
-<input type="radio" name="size" value="Lainnya" onclick="toggleSize()"> Lainnya
+<input type="radio" name="size" value="Lainnya"> Lainnya
 </div>
 
 <input type="text" id="sizeLainnya" placeholder="Isi size lainnya..." style="display:none;">
@@ -141,14 +140,24 @@ BILA MEMASUKAN LEBIH DARI 1 ORDERAN BAJU HARAP KLIK SIMPAN DAHULU DAN JIKA SUDAH
 
 <script>
 let data = JSON.parse(localStorage.getItem("orders")) || [];
+let sentData = JSON.parse(localStorage.getItem("sent")) || [];
 
+// TOGGLE SIZE
 function toggleSize(){
-document.getElementById("sizeLainnya").style.display="block";
+let val = document.querySelector('input[name="size"]:checked').value;
+let input = document.getElementById("sizeLainnya");
+
+if(val === "Lainnya"){
+    input.style.display = "block";
+}else{
+    input.style.display = "none";
+    input.value = "";
+}
 }
 
-// CEK DUPLIKAT
+// CEK DUPLIKAT GLOBAL
 function isDuplicate(newData){
-return data.some(d =>
+return [...data, ...sentData].some(d =>
 d.nama===newData.nama &&
 d.size===newData.size &&
 d.lengan===newData.lengan &&
@@ -158,6 +167,7 @@ d.hp===newData.hp
 );
 }
 
+// AMBIL FORM
 function ambilForm(){
 let nama = document.getElementById("nama").value.trim();
 let size = document.querySelector('input[name="size"]:checked').value;
@@ -178,12 +188,13 @@ return null;
 return {nama,size,lengan,umur,gender,hp,waktu:new Date().toLocaleString(),status:"Belum"};
 }
 
+// SIMPAN
 function simpan(){
 let form = ambilForm();
 if(!form) return;
 
 if(isDuplicate(form)){
-alert("❌ Data sudah ada!");
+alert("❌ Data sudah ada / pernah dikirim!");
 return;
 }
 
@@ -192,6 +203,7 @@ localStorage.setItem("orders",JSON.stringify(data));
 render();
 }
 
+// RENDER
 function render(){
 let tbody=document.getElementById("tbody");
 tbody.innerHTML="";
@@ -210,12 +222,14 @@ tbody.innerHTML+=`<tr class="${d.status==='Terkirim'?'sent':''}">
 });
 }
 
+// HAPUS
 function hapus(i){
 data.splice(i,1);
 localStorage.setItem("orders",JSON.stringify(data));
 render();
 }
 
+// EXPORT
 function exportExcel(){
 let ws=XLSX.utils.json_to_sheet(data);
 let wb=XLSX.utils.book_new();
@@ -223,36 +237,34 @@ XLSX.utils.book_append_sheet(wb,ws,"Data");
 XLSX.writeFile(wb,"data.xlsx");
 }
 
-// 🔥 KIRIM
+// KIRIM
 function kirimKeSheet(){
-const url="https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQwt4xlfb_P8vYAYg0DWZajQ/formResponse";
-
-// ambil input langsung
 let form = ambilForm();
 
-// jika tidak ada data di tabel → kirim langsung
+// KIRIM LANGSUNG
 if(data.length===0 && form){
 if(isDuplicate(form)){
 alert("❌ Data sudah pernah dikirim!");
 return;
 }
 kirim(form);
+resetForm();
 alert("✅ Langsung terkirim!");
 return;
 }
 
-// kirim semua data tabel
+// KIRIM SEMUA
 data.forEach(d=>{
 if(d.status==="Terkirim") return;
 kirim(d);
 d.status="Terkirim";
+sentData.push(d);
 });
 
-// simpan & refresh
-localStorage.setItem("orders",JSON.stringify(data));
-render();
+// SIMPAN
+localStorage.setItem("sent",JSON.stringify(sentData));
 
-// hapus setelah kirim
+// HAPUS TABEL
 data=[];
 localStorage.removeItem("orders");
 render();
@@ -260,6 +272,7 @@ render();
 alert("✅ Semua data terkirim & tabel dikosongkan");
 }
 
+// PROSES KIRIM
 function kirim(d){
 let f=new FormData();
 f.append("entry.602917443",d.nama);
@@ -274,12 +287,20 @@ fetch("https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQw
 {method:"POST",mode:"no-cors",body:f});
 }
 
+// RESET FORM
+function resetForm(){
+document.getElementById("nama").value="";
+document.getElementById("hp").value="";
+document.getElementById("sizeLainnya").value="";
+document.getElementById("sizeLainnya").style.display="none";
+}
+
+// INIT
 render();
 
-// SERVICE WORKER UPDATE
+// SERVICE WORKER
 if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('service-worker.js')
-.then(reg=>reg.update());
+navigator.serviceWorker.register('service-worker.js').then(r=>r.update());
 }
 </script>
 
