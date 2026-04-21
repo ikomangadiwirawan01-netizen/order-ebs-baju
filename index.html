@@ -8,8 +8,6 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2196F3">
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
 <style>
 * { box-sizing: border-box; font-family: Arial, sans-serif; }
 
@@ -52,10 +50,10 @@ button {
     border: none;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 14px;
 }
 
 .btn { background: #2196F3; color: white; }
-.delete-btn { background: red; color: white; }
 
 table {
     width: 100%;
@@ -73,6 +71,47 @@ th, td {
 .sent {
     background: #c8f7c5;
 }
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* RESPONSIVE HP */
+@media (max-width: 768px) {
+
+    table thead {
+        display: none;
+    }
+
+    table, tbody, tr, td {
+        display: block;
+        width: 100%;
+    }
+
+    tr {
+        background: #fff;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border: none;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #555;
+    }
+}
 </style>
 </head>
 
@@ -80,12 +119,6 @@ th, td {
 
 <div class="container">
 <h2>PEMESANAN BAJU</h2>
-
-<div style="background:#fff3cd; padding:10px; border-radius:8px; border:1px solid #ffeeba; margin-bottom:15px;">
-<b style="color:#856404;">
-BILA MEMASUKAN LEBIH DARI 1 ORDERAN BAJU HARAP KLIK SIMPAN DAHULU DAN JIKA SUDAH SEMUANYA BENAR KLIK KIRIM KE GOOGLE SHEET
-</b>
-</div>
 
 <input type="text" id="nama" placeholder="Nama">
 
@@ -110,13 +143,13 @@ BILA MEMASUKAN LEBIH DARI 1 ORDERAN BAJU HARAP KLIK SIMPAN DAHULU DAN JIKA SUDAH
 </div>
 
 <label>Kategori Umur:</label>
-<div class="radio-group">
+<div class="radio-group" onchange="toggleGender()">
 <input type="radio" name="umur" value="Dewasa" checked> Dewasa
 <input type="radio" name="umur" value="Anak-Anak"> Anak-Anak
 </div>
 
 <label>Gender:</label>
-<div class="radio-group">
+<div class="radio-group" id="genderGroup">
 <input type="radio" name="gender" value="Cowok" checked> Cowok
 <input type="radio" name="gender" value="Cewek"> Cewek
 </div>
@@ -124,9 +157,9 @@ BILA MEMASUKAN LEBIH DARI 1 ORDERAN BAJU HARAP KLIK SIMPAN DAHULU DAN JIKA SUDAH
 <input type="text" id="hp" placeholder="No HP (boleh kosong)">
 
 <button class="btn" onclick="simpan()">Simpan</button>
-<button class="btn" onclick="exportExcel()">Export Excel</button>
 <button class="btn" onclick="kirimKeSheet()">Kirim ke Google Sheet</button>
 
+<div class="table-wrapper">
 <table>
 <thead>
 <tr>
@@ -135,6 +168,7 @@ BILA MEMASUKAN LEBIH DARI 1 ORDERAN BAJU HARAP KLIK SIMPAN DAHULU DAN JIKA SUDAH
 </thead>
 <tbody id="tbody"></tbody>
 </table>
+</div>
 
 </div>
 
@@ -142,7 +176,6 @@ BILA MEMASUKAN LEBIH DARI 1 ORDERAN BAJU HARAP KLIK SIMPAN DAHULU DAN JIKA SUDAH
 let data = JSON.parse(localStorage.getItem("orders")) || [];
 let sentData = JSON.parse(localStorage.getItem("sent")) || [];
 
-// TOGGLE SIZE
 function toggleSize(){
 let val = document.querySelector('input[name="size"]:checked').value;
 let input = document.getElementById("sizeLainnya");
@@ -155,7 +188,18 @@ if(val === "Lainnya"){
 }
 }
 
-// CEK DUPLIKAT GLOBAL
+// 🔥 TOGGLE GENDER
+function toggleGender(){
+let umur = document.querySelector('input[name="umur"]:checked').value;
+let genderGroup = document.getElementById("genderGroup");
+
+if(umur === "Anak-Anak"){
+    genderGroup.style.display = "none";
+} else {
+    genderGroup.style.display = "flex";
+}
+}
+
 function isDuplicate(newData){
 return [...data, ...sentData].some(d =>
 d.nama===newData.nama &&
@@ -167,28 +211,31 @@ d.hp===newData.hp
 );
 }
 
-// AMBIL FORM
 function ambilForm(){
 let nama = document.getElementById("nama").value.trim();
 let size = document.querySelector('input[name="size"]:checked').value;
 let hp = document.getElementById("hp").value.trim();
 let lengan = document.querySelector('input[name="lengan"]:checked').value;
 let umur = document.querySelector('input[name="umur"]:checked').value;
-let gender = document.querySelector('input[name="gender"]:checked').value;
+let gender = "";
+
+// 🔥 kalau dewasa baru ambil gender
+if(umur === "Dewasa"){
+    gender = document.querySelector('input[name="gender"]:checked').value;
+}
 
 if(size==="Lainnya"){
 size=document.getElementById("sizeLainnya").value.trim();
 }
 
-if(!nama||!size||!lengan||!umur||!gender){
-alert("Semua wajib kecuali HP");
+if(!nama||!size||!lengan||!umur){
+alert("Isi data wajib");
 return null;
 }
 
 return {nama,size,lengan,umur,gender,hp,waktu:new Date().toLocaleString(),status:"Belum"};
 }
 
-// SIMPAN
 function simpan(){
 let form = ambilForm();
 if(!form) return;
@@ -203,45 +250,37 @@ localStorage.setItem("orders",JSON.stringify(data));
 render();
 }
 
-// RENDER
 function render(){
 let tbody=document.getElementById("tbody");
 tbody.innerHTML="";
+
 data.forEach((d,i)=>{
-tbody.innerHTML+=`<tr class="${d.status==='Terkirim'?'sent':''}">
-<td>${d.nama}</td>
-<td>${d.size}</td>
-<td>${d.lengan}</td>
-<td>${d.umur}</td>
-<td>${d.gender}</td>
-<td>${d.hp}</td>
-<td>${d.waktu}</td>
-<td>${d.status}</td>
-<td><button onclick="hapus(${i})">Hapus</button></td>
+tbody.innerHTML+=`
+<tr class="${d.status==='Terkirim'?'sent':''}">
+<td data-label="Nama">${d.nama}</td>
+<td data-label="Size">${d.size}</td>
+<td data-label="Lengan">${d.lengan}</td>
+<td data-label="Umur">${d.umur}</td>
+<td data-label="Gender">${d.gender||"-"}</td>
+<td data-label="No HP">${d.hp}</td>
+<td data-label="Waktu">${d.waktu}</td>
+<td data-label="Status">${d.status}</td>
+<td data-label="Aksi">
+<button onclick="hapus(${i})">Hapus</button>
+</td>
 </tr>`;
 });
 }
 
-// HAPUS
 function hapus(i){
 data.splice(i,1);
 localStorage.setItem("orders",JSON.stringify(data));
 render();
 }
 
-// EXPORT
-function exportExcel(){
-let ws=XLSX.utils.json_to_sheet(data);
-let wb=XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(wb,ws,"Data");
-XLSX.writeFile(wb,"data.xlsx");
-}
-
-// KIRIM
 function kirimKeSheet(){
 let form = ambilForm();
 
-// KIRIM LANGSUNG
 if(data.length===0 && form){
 if(isDuplicate(form)){
 alert("❌ Data sudah pernah dikirim!");
@@ -253,7 +292,6 @@ alert("✅ Langsung terkirim!");
 return;
 }
 
-// KIRIM SEMUA
 data.forEach(d=>{
 if(d.status==="Terkirim") return;
 kirim(d);
@@ -261,10 +299,8 @@ d.status="Terkirim";
 sentData.push(d);
 });
 
-// SIMPAN
 localStorage.setItem("sent",JSON.stringify(sentData));
 
-// HAPUS TABEL
 data=[];
 localStorage.removeItem("orders");
 render();
@@ -272,7 +308,6 @@ render();
 alert("✅ Semua data terkirim & tabel dikosongkan");
 }
 
-// PROSES KIRIM
 function kirim(d){
 let f=new FormData();
 f.append("entry.602917443",d.nama);
@@ -287,7 +322,6 @@ fetch("https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQw
 {method:"POST",mode:"no-cors",body:f});
 }
 
-// RESET FORM
 function resetForm(){
 document.getElementById("nama").value="";
 document.getElementById("hp").value="";
@@ -295,10 +329,8 @@ document.getElementById("sizeLainnya").value="";
 document.getElementById("sizeLainnya").style.display="none";
 }
 
-// INIT
 render();
 
-// SERVICE WORKER
 if ('serviceWorker' in navigator) {
 navigator.serviceWorker.register('service-worker.js').then(r=>r.update());
 }
