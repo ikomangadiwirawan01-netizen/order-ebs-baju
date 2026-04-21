@@ -1,4 +1,4 @@
-const CACHE_NAME = "baju-app-v8"; // ⬅️ ganti versi setiap update
+const CACHE_NAME = "baju-app-v9"; // ⬅️ ganti versi setiap update
 const urlsToCache = [
   "./",
   "./index.html",
