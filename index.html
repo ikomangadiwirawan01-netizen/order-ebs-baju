@@ -38,38 +38,12 @@ input[type="text"] {
 
 label { font-weight: bold; display: block; margin-top: 10px; }
 
-/* ===== MODERN BOX ===== */
 .radio-group {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 
-.radio-group label {
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: 0.2s;
-    user-select: none;
-}
-
-.radio-group input {
-    display: none;
-}
-
-.radio-group label.active {
-    background: #2196F3;
-    color: #fff;
-    border-color: #2196F3;
-    transform: scale(0.95);
-}
-
-.radio-group label:hover {
-    border-color: #2196F3;
-}
-
-/* BUTTON */
 button {
     padding: 10px;
     margin: 5px 3px;
@@ -150,34 +124,34 @@ th, td {
 
 <label>Size:</label>
 <div class="radio-group" onchange="toggleSize()">
-<label class="active"><input type="radio" name="size" value="XS" checked> XS</label>
-<label><input type="radio" name="size" value="S"> S</label>
-<label><input type="radio" name="size" value="M"> M</label>
-<label><input type="radio" name="size" value="L"> L</label>
-<label><input type="radio" name="size" value="XL"> XL</label>
-<label><input type="radio" name="size" value="XXL"> XXL</label>
-<label><input type="radio" name="size" value="XXXL"> XXXL</label>
-<label><input type="radio" name="size" value="Lainnya"> Lainnya</label>
+<input type="radio" name="size" value="XS" checked> XS
+<input type="radio" name="size" value="S"> S
+<input type="radio" name="size" value="M"> M
+<input type="radio" name="size" value="L"> L
+<input type="radio" name="size" value="XL"> XL
+<input type="radio" name="size" value="XXL"> XXL
+<input type="radio" name="size" value="XXXL"> XXXL
+<input type="radio" name="size" value="Lainnya"> Lainnya
 </div>
 
 <input type="text" id="sizeLainnya" placeholder="Isi size lainnya..." style="display:none;">
 
 <label>Lengan:</label>
 <div class="radio-group">
-<label class="active"><input type="radio" name="lengan" value="Pendek" checked> Pendek</label>
-<label><input type="radio" name="lengan" value="Panjang"> Panjang</label>
+<input type="radio" name="lengan" value="Pendek" checked> Pendek
+<input type="radio" name="lengan" value="Panjang"> Panjang
 </div>
 
 <label>Kategori Umur:</label>
 <div class="radio-group" onchange="toggleGender()">
-<label class="active"><input type="radio" name="umur" value="Dewasa" checked> Dewasa</label>
-<label><input type="radio" name="umur" value="Anak-Anak"> Anak-Anak</label>
+<input type="radio" name="umur" value="Dewasa" checked> Dewasa
+<input type="radio" name="umur" value="Anak-Anak"> Anak-Anak
 </div>
 
 <label>Gender:</label>
 <div class="radio-group" id="genderGroup">
-<label class="active"><input type="radio" name="gender" value="Cowok" checked> Cowok</label>
-<label><input type="radio" name="gender" value="Cewek"> Cewek</label>
+<input type="radio" name="gender" value="Cowok" checked> Cowok
+<input type="radio" name="gender" value="Cewek"> Cewek
 </div>
 
 <input type="text" id="hp" placeholder="No HP (boleh kosong)">
@@ -202,15 +176,6 @@ th, td {
 let data = JSON.parse(localStorage.getItem("orders")) || [];
 let sentData = JSON.parse(localStorage.getItem("sent")) || [];
 
-/* ===== ANIMASI CLICK ===== */
-document.querySelectorAll(".radio-group label").forEach(label=>{
-    label.addEventListener("click",()=>{
-        let group = label.parentElement;
-        group.querySelectorAll("label").forEach(l=>l.classList.remove("active"));
-        label.classList.add("active");
-    });
-});
-
 function toggleSize(){
 let val = document.querySelector('input[name="size"]:checked').value;
 let input = document.getElementById("sizeLainnya");
@@ -223,6 +188,7 @@ if(val === "Lainnya"){
 }
 }
 
+// 🔥 TOGGLE GENDER
 function toggleGender(){
 let umur = document.querySelector('input[name="umur"]:checked').value;
 let genderGroup = document.getElementById("genderGroup");
@@ -253,6 +219,7 @@ let lengan = document.querySelector('input[name="lengan"]:checked').value;
 let umur = document.querySelector('input[name="umur"]:checked').value;
 let gender = "";
 
+// 🔥 kalau dewasa baru ambil gender
 if(umur === "Dewasa"){
     gender = document.querySelector('input[name="gender"]:checked').value;
 }
@@ -363,6 +330,10 @@ document.getElementById("sizeLainnya").style.display="none";
 }
 
 render();
+
+if ('serviceWorker' in navigator) {
+navigator.serviceWorker.register('service-worker.js').then(r=>r.update());
+}
 </script>
 
 </body>
