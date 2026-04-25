@@ -38,7 +38,6 @@ input[type="text"] {
 
 label { font-weight: bold; display: block; margin-top: 10px; }
 
-/* ===== MODERN BOX ===== */
 .radio-group {
     display: flex;
     flex-wrap: wrap;
@@ -69,7 +68,6 @@ label { font-weight: bold; display: block; margin-top: 10px; }
     border-color: #2196F3;
 }
 
-/* BUTTON */
 button {
     padding: 10px;
     margin: 5px 3px;
@@ -103,12 +101,8 @@ th, td {
     overflow-x: auto;
 }
 
-/* RESPONSIVE HP */
 @media (max-width: 768px) {
-
-    table thead {
-        display: none;
-    }
+    table thead { display: none; }
 
     table, tbody, tr, td {
         display: block;
@@ -150,7 +144,7 @@ th, td {
 
 <label>Size:</label>
 <div class="radio-group" onchange="toggleSize()">
-<label class="active"><input type="radio" name="size" value="XS" checked> XS</label>
+<label><input type="radio" name="size" value="XS"> XS</label>
 <label><input type="radio" name="size" value="S"> S</label>
 <label><input type="radio" name="size" value="M"> M</label>
 <label><input type="radio" name="size" value="L"> L</label>
@@ -164,19 +158,19 @@ th, td {
 
 <label>Lengan:</label>
 <div class="radio-group">
-<label class="active"><input type="radio" name="lengan" value="Pendek" checked> Pendek</label>
+<label><input type="radio" name="lengan" value="Pendek"> Pendek</label>
 <label><input type="radio" name="lengan" value="Panjang"> Panjang</label>
 </div>
 
 <label>Kategori Umur:</label>
 <div class="radio-group" onchange="toggleGender()">
-<label class="active"><input type="radio" name="umur" value="Dewasa" checked> Dewasa</label>
+<label><input type="radio" name="umur" value="Dewasa"> Dewasa</label>
 <label><input type="radio" name="umur" value="Anak-Anak"> Anak-Anak</label>
 </div>
 
 <label>Gender:</label>
 <div class="radio-group" id="genderGroup">
-<label class="active"><input type="radio" name="gender" value="Cowok" checked> Cowok</label>
+<label><input type="radio" name="gender" value="Cowok"> Cowok</label>
 <label><input type="radio" name="gender" value="Cewek"> Cewek</label>
 </div>
 
@@ -202,7 +196,6 @@ th, td {
 let data = JSON.parse(localStorage.getItem("orders")) || [];
 let sentData = JSON.parse(localStorage.getItem("sent")) || [];
 
-/* ===== ANIMASI CLICK ===== */
 document.querySelectorAll(".radio-group label").forEach(label=>{
     label.addEventListener("click",()=>{
         let group = label.parentElement;
@@ -212,154 +205,197 @@ document.querySelectorAll(".radio-group label").forEach(label=>{
 });
 
 function toggleSize(){
-let val = document.querySelector('input[name="size"]:checked').value;
-let input = document.getElementById("sizeLainnya");
+    let checked = document.querySelector('input[name="size"]:checked');
+    let input = document.getElementById("sizeLainnya");
 
-if(val === "Lainnya"){
-    input.style.display = "block";
-}else{
-    input.style.display = "none";
-    input.value = "";
-}
+    if(checked && checked.value === "Lainnya"){
+        input.style.display = "block";
+    }else{
+        input.style.display = "none";
+        input.value = "";
+    }
 }
 
 function toggleGender(){
-let umur = document.querySelector('input[name="umur"]:checked').value;
-let genderGroup = document.getElementById("genderGroup");
+    let checked = document.querySelector('input[name="umur"]:checked');
+    let genderGroup = document.getElementById("genderGroup");
 
-if(umur === "Anak-Anak"){
-    genderGroup.style.display = "none";
-} else {
-    genderGroup.style.display = "flex";
-}
+    if(checked && checked.value === "Anak-Anak"){
+        genderGroup.style.display = "none";
+        document.querySelectorAll('input[name="gender"]').forEach(g => g.checked = false);
+        genderGroup.querySelectorAll("label").forEach(l => l.classList.remove("active"));
+    } else {
+        genderGroup.style.display = "flex";
+    }
 }
 
 function isDuplicate(newData){
-return [...data, ...sentData].some(d =>
-d.nama===newData.nama &&
-d.size===newData.size &&
-d.lengan===newData.lengan &&
-d.umur===newData.umur &&
-d.gender===newData.gender &&
-d.hp===newData.hp
-);
+    return [...data, ...sentData].some(d =>
+        d.nama===newData.nama &&
+        d.size===newData.size &&
+        d.lengan===newData.lengan &&
+        d.umur===newData.umur &&
+        d.gender===newData.gender &&
+        d.hp===newData.hp
+    );
 }
 
 function ambilForm(){
-let nama = document.getElementById("nama").value.trim();
-let size = document.querySelector('input[name="size"]:checked').value;
-let hp = document.getElementById("hp").value.trim();
-let lengan = document.querySelector('input[name="lengan"]:checked').value;
-let umur = document.querySelector('input[name="umur"]:checked').value;
-let gender = "";
+    let nama = document.getElementById("nama").value.trim();
+    let hp = document.getElementById("hp").value.trim();
 
-if(umur === "Dewasa"){
-    gender = document.querySelector('input[name="gender"]:checked').value;
-}
+    let sizeInput = document.querySelector('input[name="size"]:checked');
+    let lenganInput = document.querySelector('input[name="lengan"]:checked');
+    let umurInput = document.querySelector('input[name="umur"]:checked');
+    let genderInput = document.querySelector('input[name="gender"]:checked');
 
-if(size==="Lainnya"){
-size=document.getElementById("sizeLainnya").value.trim();
-}
+    if(!nama || !sizeInput || !lenganInput || !umurInput){
+        alert("Data belum terisi semua");
+        return null;
+    }
 
-if(!nama||!size||!lengan||!umur){
-alert("Isi data wajib");
-return null;
-}
+    let size = sizeInput.value;
+    let lengan = lenganInput.value;
+    let umur = umurInput.value;
+    let gender = "";
 
-return {nama,size,lengan,umur,gender,hp,waktu:new Date().toLocaleString(),status:"Belum"};
+    if(size === "Lainnya"){
+        size = document.getElementById("sizeLainnya").value.trim();
+        if(!size){
+            alert("Data belum terisi semua");
+            return null;
+        }
+    }
+
+    if(umur === "Dewasa"){
+        if(!genderInput){
+            alert("Data belum terisi semua");
+            return null;
+        }
+        gender = genderInput.value;
+    }
+
+    alert("Sudah terisi semua");
+
+    return {
+        nama,
+        size,
+        lengan,
+        umur,
+        gender,
+        hp,
+        waktu: new Date().toLocaleString(),
+        status: "Belum"
+    };
 }
 
 function simpan(){
-let form = ambilForm();
-if(!form) return;
+    let form = ambilForm();
+    if(!form) return;
 
-if(isDuplicate(form)){
-alert("❌ Data sudah ada / pernah dikirim!");
-return;
-}
+    if(isDuplicate(form)){
+        alert("❌ Data sudah ada / pernah dikirim!");
+        return;
+    }
 
-data.push(form);
-localStorage.setItem("orders",JSON.stringify(data));
-render();
+    data.push(form);
+    localStorage.setItem("orders", JSON.stringify(data));
+    render();
+
+    alert("Tersimpan di BROWSER");
 }
 
 function render(){
-let tbody=document.getElementById("tbody");
-tbody.innerHTML="";
+    let tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
 
-data.forEach((d,i)=>{
-tbody.innerHTML+=`
-<tr class="${d.status==='Terkirim'?'sent':''}">
-<td data-label="Nama">${d.nama}</td>
-<td data-label="Size">${d.size}</td>
-<td data-label="Lengan">${d.lengan}</td>
-<td data-label="Umur">${d.umur}</td>
-<td data-label="Gender">${d.gender||"-"}</td>
-<td data-label="No HP">${d.hp}</td>
-<td data-label="Waktu">${d.waktu}</td>
-<td data-label="Status">${d.status}</td>
-<td data-label="Aksi">
-<button onclick="hapus(${i})">Hapus</button>
-</td>
-</tr>`;
-});
+    data.forEach((d,i)=>{
+        tbody.innerHTML += `
+        <tr class="${d.status==='Terkirim'?'sent':''}">
+        <td data-label="Nama">${d.nama}</td>
+        <td data-label="Size">${d.size}</td>
+        <td data-label="Lengan">${d.lengan}</td>
+        <td data-label="Umur">${d.umur}</td>
+        <td data-label="Gender">${d.gender||"-"}</td>
+        <td data-label="No HP">${d.hp}</td>
+        <td data-label="Waktu">${d.waktu}</td>
+        <td data-label="Status">${d.status}</td>
+        <td data-label="Aksi">
+        <button onclick="hapus(${i})">Hapus</button>
+        </td>
+        </tr>`;
+    });
 }
 
 function hapus(i){
-data.splice(i,1);
-localStorage.setItem("orders",JSON.stringify(data));
-render();
+    data.splice(i,1);
+    localStorage.setItem("orders", JSON.stringify(data));
+    render();
 }
 
 function kirimKeSheet(){
-let form = ambilForm();
+    let form = ambilForm();
+    if(!form) return;
 
-if(data.length===0 && form){
-if(isDuplicate(form)){
-alert("❌ Data sudah pernah dikirim!");
-return;
-}
-kirim(form);
-resetForm();
-alert("✅ Langsung terkirim!");
-return;
-}
+    if(isDuplicate(form)){
+        alert("❌ Data sudah ada / pernah dikirim!");
+        return;
+    }
 
-data.forEach(d=>{
-if(d.status==="Terkirim") return;
-kirim(d);
-d.status="Terkirim";
-sentData.push(d);
-});
+    data.push(form);
+    localStorage.setItem("orders", JSON.stringify(data));
+    render();
 
-localStorage.setItem("sent",JSON.stringify(sentData));
+    let konfirmasi = confirm(
+        "Silakan periksa kembali apakah sudah benar.\n\nKlik OK untuk Kirim.\nKlik Cancel untuk memeriksa kembali."
+    );
 
-data=[];
-localStorage.removeItem("orders");
-render();
+    if(!konfirmasi){
+        alert("Silakan periksa kembali data Anda.");
+        return;
+    }
 
-alert("✅ Semua data terkirim & tabel dikosongkan");
+    data.forEach(d=>{
+        if(d.status === "Terkirim") return;
+
+        kirim(d);
+        d.status = "Terkirim";
+        sentData.push(d);
+    });
+
+    localStorage.setItem("sent", JSON.stringify(sentData));
+
+    data = [];
+    localStorage.removeItem("orders");
+    render();
+    resetForm();
+
+    alert("✅ Data sudah TERKIRIM KE GOOGLE SPREADSHEET.");
 }
 
 function kirim(d){
-let f=new FormData();
-f.append("entry.602917443",d.nama);
-f.append("entry.1125006949",d.size);
-f.append("entry.851126045",d.lengan);
-f.append("entry.472633795",d.umur);
-f.append("entry.172735209",d.gender);
-f.append("entry.1294797526",d.hp);
-f.append("entry.804883247",d.waktu);
+    let f = new FormData();
+    f.append("entry.602917443", d.nama);
+    f.append("entry.1125006949", d.size);
+    f.append("entry.851126045", d.lengan);
+    f.append("entry.472633795", d.umur);
+    f.append("entry.172735209", d.gender);
+    f.append("entry.1294797526", d.hp);
+    f.append("entry.804883247", d.waktu);
 
-fetch("https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQwt4xlfb_P8vYAYg0DWZajQ/formResponse",
-{method:"POST",mode:"no-cors",body:f});
+    fetch("https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQwt4xlfb_P8vYAYg0DWZajQ/formResponse",
+    {method:"POST", mode:"no-cors", body:f});
 }
 
 function resetForm(){
-document.getElementById("nama").value="";
-document.getElementById("hp").value="";
-document.getElementById("sizeLainnya").value="";
-document.getElementById("sizeLainnya").style.display="none";
+    document.getElementById("nama").value = "";
+    document.getElementById("hp").value = "";
+    document.getElementById("sizeLainnya").value = "";
+    document.getElementById("sizeLainnya").style.display = "none";
+
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    document.querySelectorAll(".radio-group label").forEach(l => l.classList.remove("active"));
+    document.getElementById("genderGroup").style.display = "flex";
 }
 
 render();
