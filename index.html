@@ -28,6 +28,19 @@ body {
 
 h2 { text-align: center; }
 
+.note-box {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    color: #856404;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
 input[type="text"] {
     width: 100%;
     padding: 10px;
@@ -36,7 +49,11 @@ input[type="text"] {
     border: 1px solid #ccc;
 }
 
-label { font-weight: bold; display: block; margin-top: 10px; }
+label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+}
 
 .radio-group {
     display: flex;
@@ -77,7 +94,10 @@ button {
     font-size: 14px;
 }
 
-.btn { background: #2196F3; color: white; }
+.btn {
+    background: #2196F3;
+    color: white;
+}
 
 table {
     width: 100%;
@@ -102,7 +122,9 @@ th, td {
 }
 
 @media (max-width: 768px) {
-    table thead { display: none; }
+    table thead {
+        display: none;
+    }
 
     table, tbody, tr, td {
         display: block;
@@ -140,38 +162,42 @@ th, td {
 <div class="container">
 <h2>PEMESANAN BAJU</h2>
 
+<div class="note-box">
+    JIKA INGIN MEMESAN LEBIH DARI 1 BAJU, SILAKAN KLIK SIMPAN TERLEBIH DAHULU. SETELAH SEMUA DATA SUDAH BENAR, KLIK KIRIM KE GOOGLE SPREADSHEETS.
+</div>
+
 <input type="text" id="nama" placeholder="Nama">
 
 <label>Size:</label>
 <div class="radio-group" onchange="toggleSize()">
-<label><input type="radio" name="size" value="XS"> XS</label>
-<label><input type="radio" name="size" value="S"> S</label>
-<label><input type="radio" name="size" value="M"> M</label>
-<label><input type="radio" name="size" value="L"> L</label>
-<label><input type="radio" name="size" value="XL"> XL</label>
-<label><input type="radio" name="size" value="XXL"> XXL</label>
-<label><input type="radio" name="size" value="XXXL"> XXXL</label>
-<label><input type="radio" name="size" value="Lainnya"> Lainnya</label>
+    <label><input type="radio" name="size" value="XS"> XS</label>
+    <label><input type="radio" name="size" value="S"> S</label>
+    <label><input type="radio" name="size" value="M"> M</label>
+    <label><input type="radio" name="size" value="L"> L</label>
+    <label><input type="radio" name="size" value="XL"> XL</label>
+    <label><input type="radio" name="size" value="XXL"> XXL</label>
+    <label><input type="radio" name="size" value="XXXL"> XXXL</label>
+    <label><input type="radio" name="size" value="Lainnya"> Lainnya</label>
 </div>
 
 <input type="text" id="sizeLainnya" placeholder="Isi size lainnya..." style="display:none;">
 
 <label>Lengan:</label>
 <div class="radio-group">
-<label><input type="radio" name="lengan" value="Pendek"> Pendek</label>
-<label><input type="radio" name="lengan" value="Panjang"> Panjang</label>
+    <label><input type="radio" name="lengan" value="Pendek"> Pendek</label>
+    <label><input type="radio" name="lengan" value="Panjang"> Panjang</label>
 </div>
 
 <label>Kategori Umur:</label>
 <div class="radio-group" onchange="toggleGender()">
-<label><input type="radio" name="umur" value="Dewasa"> Dewasa</label>
-<label><input type="radio" name="umur" value="Anak-Anak"> Anak-Anak</label>
+    <label><input type="radio" name="umur" value="Dewasa"> Dewasa</label>
+    <label><input type="radio" name="umur" value="Anak-Anak"> Anak-Anak</label>
 </div>
 
 <label>Gender:</label>
 <div class="radio-group" id="genderGroup">
-<label><input type="radio" name="gender" value="Cowok"> Cowok</label>
-<label><input type="radio" name="gender" value="Cewek"> Cewek</label>
+    <label><input type="radio" name="gender" value="Cowok"> Cowok</label>
+    <label><input type="radio" name="gender" value="Cewek"> Cewek</label>
 </div>
 
 <input type="text" id="hp" placeholder="No HP (boleh kosong)">
@@ -183,7 +209,15 @@ th, td {
 <table>
 <thead>
 <tr>
-<th>Nama</th><th>Size</th><th>Lengan</th><th>Umur</th><th>Gender</th><th>No HP</th><th>Waktu</th><th>Status</th><th>Aksi</th>
+    <th>Nama</th>
+    <th>Size</th>
+    <th>Lengan</th>
+    <th>Umur</th>
+    <th>Gender</th>
+    <th>No HP</th>
+    <th>Waktu</th>
+    <th>Status</th>
+    <th>Aksi</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -196,10 +230,10 @@ th, td {
 let data = JSON.parse(localStorage.getItem("orders")) || [];
 let sentData = JSON.parse(localStorage.getItem("sent")) || [];
 
-document.querySelectorAll(".radio-group label").forEach(label=>{
-    label.addEventListener("click",()=>{
+document.querySelectorAll(".radio-group label").forEach(label => {
+    label.addEventListener("click", () => {
         let group = label.parentElement;
-        group.querySelectorAll("label").forEach(l=>l.classList.remove("active"));
+        group.querySelectorAll("label").forEach(l => l.classList.remove("active"));
         label.classList.add("active");
     });
 });
@@ -210,7 +244,7 @@ function toggleSize(){
 
     if(checked && checked.value === "Lainnya"){
         input.style.display = "block";
-    }else{
+    } else {
         input.style.display = "none";
         input.value = "";
     }
@@ -222,8 +256,14 @@ function toggleGender(){
 
     if(checked && checked.value === "Anak-Anak"){
         genderGroup.style.display = "none";
-        document.querySelectorAll('input[name="gender"]').forEach(g => g.checked = false);
-        genderGroup.querySelectorAll("label").forEach(l => l.classList.remove("active"));
+
+        document.querySelectorAll('input[name="gender"]').forEach(g => {
+            g.checked = false;
+        });
+
+        genderGroup.querySelectorAll("label").forEach(l => {
+            l.classList.remove("active");
+        });
     } else {
         genderGroup.style.display = "flex";
     }
@@ -231,12 +271,12 @@ function toggleGender(){
 
 function isDuplicate(newData){
     return [...data, ...sentData].some(d =>
-        d.nama===newData.nama &&
-        d.size===newData.size &&
-        d.lengan===newData.lengan &&
-        d.umur===newData.umur &&
-        d.gender===newData.gender &&
-        d.hp===newData.hp
+        d.nama === newData.nama &&
+        d.size === newData.size &&
+        d.lengan === newData.lengan &&
+        d.umur === newData.umur &&
+        d.gender === newData.gender &&
+        d.hp === newData.hp
     );
 }
 
@@ -250,7 +290,7 @@ function ambilForm(){
     let genderInput = document.querySelector('input[name="gender"]:checked');
 
     if(!nama || !sizeInput || !lenganInput || !umurInput){
-        alert("Data belum terisi semua");
+        alert("Isi data wajib");
         return null;
     }
 
@@ -261,21 +301,21 @@ function ambilForm(){
 
     if(size === "Lainnya"){
         size = document.getElementById("sizeLainnya").value.trim();
+
         if(!size){
-            alert("Data belum terisi semua");
+            alert("Isi size lainnya");
             return null;
         }
     }
 
     if(umur === "Dewasa"){
         if(!genderInput){
-            alert("Data belum terisi semua");
+            alert("Pilih gender");
             return null;
         }
+
         gender = genderInput.value;
     }
-
-    alert("Sudah terisi semua");
 
     return {
         nama,
@@ -300,64 +340,91 @@ function simpan(){
 
     data.push(form);
     localStorage.setItem("orders", JSON.stringify(data));
-    render();
 
-    alert("Tersimpan di BROWSER");
+    render();
+    resetForm();
+
+    alert("✅ Data tersimpan di browser");
 }
 
 function render(){
     let tbody = document.getElementById("tbody");
     tbody.innerHTML = "";
 
-    data.forEach((d,i)=>{
+    data.forEach((d, i) => {
         tbody.innerHTML += `
-        <tr class="${d.status==='Terkirim'?'sent':''}">
-        <td data-label="Nama">${d.nama}</td>
-        <td data-label="Size">${d.size}</td>
-        <td data-label="Lengan">${d.lengan}</td>
-        <td data-label="Umur">${d.umur}</td>
-        <td data-label="Gender">${d.gender||"-"}</td>
-        <td data-label="No HP">${d.hp}</td>
-        <td data-label="Waktu">${d.waktu}</td>
-        <td data-label="Status">${d.status}</td>
-        <td data-label="Aksi">
-        <button onclick="hapus(${i})">Hapus</button>
-        </td>
+        <tr class="${d.status === 'Terkirim' ? 'sent' : ''}">
+            <td data-label="Nama">${d.nama}</td>
+            <td data-label="Size">${d.size}</td>
+            <td data-label="Lengan">${d.lengan}</td>
+            <td data-label="Umur">${d.umur}</td>
+            <td data-label="Gender">${d.gender || "-"}</td>
+            <td data-label="No HP">${d.hp || "-"}</td>
+            <td data-label="Waktu">${d.waktu}</td>
+            <td data-label="Status">${d.status}</td>
+            <td data-label="Aksi">
+                <button onclick="hapus(${i})">Hapus</button>
+            </td>
         </tr>`;
     });
 }
 
 function hapus(i){
-    data.splice(i,1);
+    data.splice(i, 1);
     localStorage.setItem("orders", JSON.stringify(data));
     render();
 }
 
 function kirimKeSheet(){
-    let form = ambilForm();
-    if(!form) return;
+    let nama = document.getElementById("nama").value.trim();
 
-    if(isDuplicate(form)){
-        alert("❌ Data sudah ada / pernah dikirim!");
+    if(nama !== ""){
+        let form = ambilForm();
+        if(!form) return;
+
+        if(isDuplicate(form)){
+            alert("❌ Data sudah ada / pernah dikirim!");
+            return;
+        }
+
+        let konfirmasi = confirm(
+            "Silakan periksa kembali data Anda.\n\nKlik OK untuk langsung kirim ke Google Spreadsheet."
+        );
+
+        if(!konfirmasi){
+            alert("❌ Pengiriman dibatalkan.");
+            return;
+        }
+
+        kirim(form);
+
+        form.status = "Terkirim";
+        sentData.push(form);
+        localStorage.setItem("sent", JSON.stringify(sentData));
+
+        resetForm();
+
+        alert("✅ Data berhasil dikirim ke Google Spreadsheet!");
         return;
     }
 
-    data.push(form);
-    localStorage.setItem("orders", JSON.stringify(data));
-    render();
+    data = JSON.parse(localStorage.getItem("orders")) || [];
+
+    if(data.length === 0){
+        alert("❌ Tidak ada data tersimpan untuk dikirim.");
+        return;
+    }
 
     let konfirmasi = confirm(
-        "Silakan periksa kembali apakah sudah benar.\n\nKlik OK untuk Kirim.\nKlik Cancel untuk memeriksa kembali."
+        "Ada " + data.length + " data tersimpan di tabel.\n\nKlik OK untuk kirim semua ke Google Spreadsheet."
     );
 
     if(!konfirmasi){
-        alert("Silakan periksa kembali data Anda.");
+        alert("❌ Pengiriman dibatalkan.");
         return;
     }
 
-    data.forEach(d=>{
-        if(d.status === "Terkirim") return;
-
+    data.forEach(d => {
         kirim(d);
         d.status = "Terkirim";
         sentData.push(d);
@@ -370,11 +437,12 @@ function kirimKeSheet(){
     render();
     resetForm();
 
-    alert("✅ Data sudah TERKIRIM KE GOOGLE SPREADSHEET.");
+    alert("✅ Semua data tersimpan berhasil dikirim ke Google Spreadsheet!");
 }
 
 function kirim(d){
     let f = new FormData();
+
     f.append("entry.602917443", d.nama);
     f.append("entry.1125006949", d.size);
     f.append("entry.851126045", d.lengan);
@@ -383,8 +451,11 @@ function kirim(d){
     f.append("entry.1294797526", d.hp);
     f.append("entry.804883247", d.waktu);
 
-    fetch("https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQwt4xlfb_P8vYAYg0DWZajQ/formResponse",
-    {method:"POST", mode:"no-cors", body:f});
+    fetch("https://docs.google.com/forms/u/0/d/e/1FAIpQLSe2Zhoa4FgmAjjytXKS-_onOXQQwt4xlfb_P8vYAYg0DWZajQ/formResponse", {
+        method: "POST",
+        mode: "no-cors",
+        body: f
+    });
 }
 
 function resetForm(){
@@ -393,8 +464,14 @@ function resetForm(){
     document.getElementById("sizeLainnya").value = "";
     document.getElementById("sizeLainnya").style.display = "none";
 
-    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-    document.querySelectorAll(".radio-group label").forEach(l => l.classList.remove("active"));
+    document.querySelectorAll('input[type="radio"]').forEach(r => {
+        r.checked = false;
+    });
+
+    document.querySelectorAll(".radio-group label").forEach(l => {
+        l.classList.remove("active");
+    });
+
     document.getElementById("genderGroup").style.display = "flex";
 }
 
