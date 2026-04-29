@@ -120,6 +120,23 @@ th, td {
     width: 100%;
     overflow-x: auto;
 }
+.info-box {
+    background: #e8f5e9;
+    border: 2px solid #25D366;
+    color: #1b5e20;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.wa-btn {
+    background: #25D366;
+    color: white;
+    margin-top: 10px;
+}
 
 @media (max-width: 768px) {
     table thead {
@@ -165,6 +182,13 @@ th, td {
 <div class="note-box">
     JIKA INGIN MEMESAN LEBIH DARI 1 BAJU, SILAKAN KLIK SIMPAN TERLEBIH DAHULU. SETELAH SEMUA DATA SUDAH BENAR, KLIK KIRIM KE GOOGLE SPREADSHEETS.
 </div>
+<div class="info-box">
+    INFO TENTANG PEMESANAN DAPAT MENGHUBUNGI NOMER INI
+    <br><br>
+
+    <button class="wa-btn" onclick="hubungiWA1()">WA Mang Adi</button>
+    <button class="wa-btn" onclick="hubungiWA2()">WA Admin 2</button>
+</div>
 
 <input type="text" id="nama" placeholder="Nama">
 
@@ -203,7 +227,7 @@ th, td {
 <input type="text" id="hp" placeholder="No HP (boleh kosong)">
 
 <button class="btn" onclick="simpan()">Simpan</button>
-<button class="btn" onclick="kirimKeSheet()">Kirim ke Google Sheet</button>
+<button class="btn" onclick="kirimKeSheet()">Kirim ke Google Spreadsheet</button>
 
 <div class="table-wrapper">
 <table>
@@ -416,7 +440,7 @@ function kirimKeSheet(){
     }
 
     let konfirmasi = confirm(
-        "Ada " + data.length + " data tersimpan di tabel.\n\nKlik OK untuk kirim semua ke Google Spreadsheet."
+        "Ada " + data.length + " data tersimpan di tabel.\n\nKlik OK untuk kirim semua ke Google Spreadsheet, Klik CANCEL untuk memeriksa data kembali."
     );
 
     if(!konfirmasi){
@@ -473,6 +497,25 @@ function resetForm(){
     });
 
     document.getElementById("genderGroup").style.display = "flex";
+}
+function hubungiWA1(){
+    let nomor = "628814842970"; // nomor 1
+    let pesan = "Halo Admin 1, saya ingin bertanya tentang pemesanan baju.";
+
+    window.open(
+        "https://wa.me/" + nomor + "?text=" + encodeURIComponent(pesan),
+        "_blank"
+    );
+}
+
+function hubungiWA2(){
+    let nomor = "6282222222222"; // nomor 2
+    let pesan = "Halo Admin 2, saya ingin bertanya tentang pemesanan baju.";
+
+    window.open(
+        "https://wa.me/" + nomor + "?text=" + encodeURIComponent(pesan),
+        "_blank"
+    );
 }
 
 render();
